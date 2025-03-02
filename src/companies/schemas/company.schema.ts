@@ -21,6 +21,12 @@ export class Company {
   @Prop()
   updatedAt: Date;
 
+  @Prop()
+  deletedAt: Date;
+
+  @Prop()
+  isDeleted: Boolean;
+
   @Prop({ type: Object })
   createdBy: {
     _id: mongoose.Schema.Types.ObjectId;

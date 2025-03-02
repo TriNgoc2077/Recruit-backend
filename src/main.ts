@@ -7,7 +7,7 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { TransformInterceptor } from './core/transform.interceptor';
-// import cookieParser from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 // import session from 'express-session';
 // import MongoStore from 'connect-mongo';
 // import ms, { StringValue } from 'ms';
@@ -23,7 +23,8 @@ async function bootstrap() {
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('ejs');
   app.useGlobalPipes(new ValidationPipe());
-  // app.use(cookieParser());
+  //config cookie
+  app.use(cookieParser());
   // //config session
   // app.use(
   //   session({
@@ -41,9 +42,10 @@ async function bootstrap() {
 
   //config cors
   app.enableCors({
-    origin: '*',
+    origin: true,
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
     preflightContinue: false,
+    credentials: true,
   });
 
   //config versioning
