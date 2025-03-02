@@ -3,9 +3,10 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { TransformInterceptor } from './core/transform.interceptor';
 // import cookieParser from 'cookie-parser';
 // import session from 'express-session';
 // import MongoStore from 'connect-mongo';
@@ -16,12 +17,12 @@ async function bootstrap() {
 
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new JwtAuthGuard(reflector));
+  app.useGlobalInterceptors(new TransformInterceptor(reflector));
 
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   app.setViewEngine('ejs');
   app.useGlobalPipes(new ValidationPipe());
-
   // app.use(cookieParser());
   // //config session
   // app.use(
@@ -37,6 +38,20 @@ async function bootstrap() {
   //     }),
   //   }),
   // );
+
+  //config cors
+  app.enableCors({
+    origin: '*',
+    methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
+    preflightContinue: false,
+  });
+
+  //config versioning
+  app.setGlobalPrefix('api'); //api/v
+  app.enableVersioning({
+    type: VersioningType.URI,
+    defaultVersion: ['1', '2'],
+  });
   await app.listen(configService.get<string>('PORT'));
 }
 bootstrap();
