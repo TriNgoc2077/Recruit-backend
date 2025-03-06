@@ -109,7 +109,7 @@ export class UsersService {
 
   findOne(id: string) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return 'Not found user !';
+      throw new BadRequestException(`Not found user with id=${id}`);
     }
     return this.userModel
       .findOne({
@@ -152,7 +152,7 @@ export class UsersService {
 
   async remove(id: string, @UserDecorator() user: IUser) {
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return 'Not found user !';
+      throw new BadRequestException(`Not found user with id=${id}`);
     }
     await this.userModel.updateOne(
       { _id: id },

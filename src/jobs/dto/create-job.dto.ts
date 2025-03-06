@@ -17,6 +17,9 @@ class Company {
 
   @IsNotEmpty({ message: 'Name must not be empty !' })
   name: string;
+
+  @IsNotEmpty()
+  logo: string;
 }
 
 export class CreateJobDto {
@@ -35,6 +38,7 @@ export class CreateJobDto {
   @Type(() => Company)
   company: Company;
 
+  @IsNotEmpty()
   location: string;
 
   salary: number;
