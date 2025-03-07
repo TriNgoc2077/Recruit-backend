@@ -10,6 +10,8 @@ import { CompaniesModule } from './companies/companies.module';
 import { JobsModule } from './jobs/jobs.module';
 import { FilesModule } from './files/files.module';
 import { ResumesModule } from './resumes/resumes.module';
+import { PermissionsModule } from './permissions/permissions.module';
+import { RolesModule } from './roles/roles.module';
 
 ConfigModule;
 MongooseModule;
@@ -46,6 +48,10 @@ MongooseModule;
     FilesModule,
 
     ResumesModule,
+
+    PermissionsModule,
+
+    RolesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
