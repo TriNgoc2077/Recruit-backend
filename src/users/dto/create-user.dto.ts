@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsEmail,
+  IsMongoId,
   IsNotEmpty,
   IsNotEmptyObject,
   IsObject,
@@ -35,6 +36,7 @@ export class CreateUserDto {
   address: number;
 
   @IsNotEmpty({ message: 'Role must not be empty !' })
+  @IsMongoId({ message: 'Role has format mongoId !' })
   role: string;
 
   @IsNotEmptyObject()

@@ -9,10 +9,12 @@ import { SoftDeleteModel } from 'soft-delete-plugin-mongoose';
 import aqp from 'api-query-params';
 import { IUser } from './users.interface';
 import { User as UserDecorator } from 'src/decorator/customize';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
+    private configService: ConfigService,
   ) {}
 
   getHashPassword = (password: string) => {
@@ -115,13 +117,16 @@ export class UsersService {
       .findOne({
         _id: id,
       })
-      .select('-password');
+      .select('-password')
+      .populate({ path: 'role', select: { name: 1, _id: 1 } });
   }
 
   findOneByUsername(username: string) {
-    return this.userModel.findOne({
-      email: username,
-    });
+    return this.userModel
+      .findOne({
+        email: username,
+      })
+      .populate({ path: 'role', select: { name: 1, permissions: 1 } });
   }
 
   async update(updateUserDto: UpdateUserDto, @UserDecorator() user: IUser) {
@@ -154,6 +159,10 @@ export class UsersService {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       throw new BadRequestException(`Not found user with id=${id}`);
     }
+    const foundUser = await this.userModel.findById(id);
+    const ADMIN_EMAIL = this.configService.get<string>('ADMIN_EMAIL');
+    if (foundUser.email === ADMIN_EMAIL)
+      throw new BadRequestException('Cannot delete admin account !');
     await this.userModel.updateOne(
       { _id: id },
       {
