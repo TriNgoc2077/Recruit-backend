@@ -134,9 +134,16 @@ export class UsersService {
       .populate({ path: 'role', select: { name: 1 } });
   }
 
-  async update(updateUserDto: UpdateUserDto, @UserDecorator() user: IUser) {
+  async update(
+    updateUserDto: UpdateUserDto,
+    @UserDecorator() user: IUser,
+    id: string,
+  ) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new BadRequestException(`Not found user with id=${id}`);
+    }
     const idExist = await this.userModel.findOne({
-      _id: updateUserDto._id,
+      _id: id,
     });
     if (!idExist) throw new BadRequestException('User not found !');
 
@@ -148,7 +155,7 @@ export class UsersService {
 
     return await this.userModel.updateOne(
       {
-        _id: updateUserDto._id,
+        _id: id,
       },
       {
         ...updateUserDto,
