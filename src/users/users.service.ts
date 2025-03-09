@@ -10,10 +10,13 @@ import aqp from 'api-query-params';
 import { IUser } from './users.interface';
 import { User as UserDecorator } from 'src/decorator/customize';
 import { ConfigService } from '@nestjs/config';
+import { Role, RoleDocument } from 'src/roles/schemas/role.schema';
+import { USER_ROLE } from 'src/databases/sample';
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: SoftDeleteModel<UserDocument>,
+    @InjectModel(Role.name) private roleModel: SoftDeleteModel<RoleDocument>,
     private configService: ConfigService,
   ) {}
 
@@ -37,6 +40,8 @@ export class UsersService {
       );
     }
 
+    const userRole = await this.roleModel.findOne({ name: USER_ROLE });
+
     const hashPassword = this.getHashPassword(password);
     let newUser = await this.userModel.create({
       name,
@@ -45,7 +50,7 @@ export class UsersService {
       age,
       gender,
       address,
-      role,
+      role: userRole?._id,
       company,
       createdBy: {
         _id: user._id,
@@ -117,7 +122,7 @@ export class UsersService {
       .findOne({
         _id: id,
       })
-      .select('-password')
+      .select('-password -refreshToken')
       .populate({ path: 'role', select: { name: 1, _id: 1 } });
   }
 
@@ -126,7 +131,7 @@ export class UsersService {
       .findOne({
         email: username,
       })
-      .populate({ path: 'role', select: { name: 1, permissions: 1 } });
+      .populate({ path: 'role', select: { name: 1 } });
   }
 
   async update(updateUserDto: UpdateUserDto, @UserDecorator() user: IUser) {
@@ -161,7 +166,7 @@ export class UsersService {
     }
     const foundUser = await this.userModel.findById(id);
     const ADMIN_EMAIL = this.configService.get<string>('ADMIN_EMAIL');
-    if (foundUser.email === ADMIN_EMAIL)
+    if (foundUser && foundUser.email === ADMIN_EMAIL)
       throw new BadRequestException('Cannot delete admin account !');
     await this.userModel.updateOne(
       { _id: id },
@@ -179,12 +184,17 @@ export class UsersService {
 
   updateUserToken = async (refreshToken: string, _id: string) => {
     try {
-      return await this.userModel.updateOne(
-        { _id },
-        {
-          refreshToken,
-        },
-      );
+      return await this.userModel
+        .updateOne(
+          { _id },
+          {
+            refreshToken,
+          },
+        )
+        .populate({
+          path: 'role',
+          select: { name: 1 },
+        });
     } catch (error) {
       console.log(error);
     }

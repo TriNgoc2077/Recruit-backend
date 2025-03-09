@@ -12,14 +12,22 @@ import { FilesModule } from './files/files.module';
 import { ResumesModule } from './resumes/resumes.module';
 import { PermissionsModule } from './permissions/permissions.module';
 import { RolesModule } from './roles/roles.module';
-
+import { DatabasesModule } from './databases/databases.module';
+import { MailModule } from './mail/mail.module';
+import { SubscribersModule } from './subcribers/subscribers.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { HealthModule } from './health/health.module';
 ConfigModule;
 MongooseModule;
 @Module({
   imports: [
-    // MongooseModule.forRoot(
-    //   '',
-    // ),
+    ScheduleModule.forRoot(),
+    //throttler limit in 60 seconds, maximum 10 requests
+    ThrottlerModule.forRoot({
+      ttl: 60,
+      limit: 10,
+    }),
 
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -52,6 +60,14 @@ MongooseModule;
     PermissionsModule,
 
     RolesModule,
+
+    DatabasesModule,
+
+    SubscribersModule,
+
+    MailModule,
+
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

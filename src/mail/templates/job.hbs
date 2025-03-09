@@ -1,0 +1,27 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Document</title>
+  </head>
+  <body>
+    Hello
+    {{receiver}}
+    <table>
+      {{#each jobs}}
+        <tr>
+          <td>
+            <div>{{name}}</div>
+            <div>{{company}}</div>
+            <div>{{salary}}</div>
+            <div>
+              {{#each skills}}
+                <span>{{this}}</span>
+              {{/each}}
+            </div>
+          </td>
+        </tr>
+      {{/each}}
+    </table>
+  </body>
+</html>

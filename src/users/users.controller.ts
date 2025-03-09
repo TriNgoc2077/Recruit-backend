@@ -18,7 +18,8 @@ import {
   User,
 } from 'src/decorator/customize';
 import { IUser } from './users.interface';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
