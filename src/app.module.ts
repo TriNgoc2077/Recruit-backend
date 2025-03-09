@@ -25,8 +25,12 @@ MongooseModule;
     ScheduleModule.forRoot(),
     //throttler limit in 60 seconds, maximum 10 requests
     ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 10,
+      throttlers: [
+        {
+          limit: 10,
+          ttl: 60 * 1000,
+        },
+      ],
     }),
 
     MongooseModule.forRootAsync({
